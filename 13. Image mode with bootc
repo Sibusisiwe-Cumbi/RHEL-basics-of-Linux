@@ -1,0 +1,113 @@
+What I Learned:
+This lesson introduced image-based RHEL, which provides an alternative to building and maintaining servers step by step.
+This connects to my Robot World Java project because we already worked with automated builds, packaged applications, Docker images, and deployment. With this knowledge, I can see how the same idea of repeatable and consistent deployments can be extended to the entire operating system.
+
+The Traditional Server Model
+Traditionally, a RHEL server is built and maintained step by step:
+OS → Updates → Applications → Configuration
+Over time, each server can be modified differently. This can lead to:
+•	Inconsistent server configurations.
+•	Less predictable updates.
+•	More difficult troubleshooting.
+•	Difficulty knowing exactly what is installed and configured on each server.
+For Robot World, manually configuring multiple servers could eventually lead to differences between environments. One server might have different Java versions, packages, configuration, or service settings from another.
+
+Image-Based RHEL
+Image-based RHEL takes a different approach.
+Instead of building each server piece by piece, a complete system image is created containing:
+•	The operating system.
+•	Applications.
+•	Packages.
+•	Configuration.
+•	System components such as systemd.
+The image acts as a blueprint for the entire system.
+
+The core idea is:
+The image defines what the whole server should look like.
+This makes deployments more consistent, predictable, and repeatable.
+
+Relating This to Robot World
+In the Robot World project, we used automation to build and package our Java application and worked with Docker images as part of deployment.
+With the knowledge from this lesson, I can distinguish between the two approaches:
+Robot World Docker image
+→ packages the application and its required environment.
+Image-based RHEL
+→ represents the complete operating system, including system components such as systemd.
+So image-based RHEL applies the idea of versioned, repeatable deployment at a much larger level.
+Instead of manually preparing a server and then installing the Robot World application, a system image could define the expected state of the entire environment.
+Updating an Image-Based System
+With image-based RHEL, updates can be handled by creating and deploying a new version of the system image.
+
+The general process is:
+Create new image → Deploy/switch to new image → Reboot
+The new image can contain updated:
+•	RHEL version.
+•	Packages.
+•	Applications.
+•	Configuration.
+The server then boots into the new system image.
+This is different from manually updating individual parts of a server over time.
+
+Consistency and Repeatability
+A major benefit is that the same image can be deployed multiple times.
+For example, if several servers need to run the same environment for a Robot World deployment, using the same system image helps ensure that they have the same operating system, packages, configuration, and system components.
+This reduces configuration differences between environments.
+
+Rollbacks
+Image-based systems can also provide a safer way to handle upgrades.
+If a new image causes problems, the system can return to a previous known-good image instead of manually reversing multiple changes.
+
+The basic idea is:
+Bad image → Return to previous image
+This is useful because the previous system state is represented by a complete image rather than a collection of individual changes.
+
+A Complete Operating System
+An important point is that an image-based RHEL image is not simply an application container or application package.
+It represents a complete RHEL operating system, including system components such as systemd.
+Once the system has booted into the image, normal RHEL administration tools can still be used.
+
+For example:
+systemctl status httpd
+and:
+rpm -q httpd
+Image Versions
+Images can be treated as versions of the entire system.
+
+For example:
+Image 1
+•	RHEL
+•	Java/application environment
+•	Robot World configuration A
+↓
+Image 2
+•	Updated RHEL
+•	Updated Java/application environment
+•	Robot World configuration B
+
+The system can move from Image 1 to Image 2 and reboot into the new version.
+This creates a clear relationship between:
+System version ↔ Image version
+This is similar to how we treated our Robot World builds and Docker images as deployable versions, but image-based RHEL applies versioning to the whole operating system.
+
+Commands
+Check the currently booted image:
+bootc status
+Switch to another image:
+bootc switch <image>
+Reboot into the new image:
+reboot
+bootc is the image-mode tooling used to manage bootable container images and image-based RHEL systems.
+
+The Big Takeaway
+Traditional RHEL:
+Build → Modify → Update → Troubleshoot
+Image-based RHEL:
+Define image → Boot image → Replace image when updating → Reboot → Roll back if necessary
+
+The key concept is:
+Image Mode = managing the server as a complete, versioned operating system image rather than individually modifying the system over time.
+Overall Understanding
+The main thing I learned is that image-based RHEL extends the idea of consistent deployment beyond just the application.
+For my Robot World project, we already experienced the benefits of repeatable builds and deployment through Maven, GitLab CI/CD, and Docker. Image-based RHEL applies a similar principle to the entire operating system environment.
+Instead of every server gradually becoming different through manual changes, the desired system state can be defined by an image and deployed consistently. Updating then becomes a matter of moving to a new version of that image, with the ability to roll back if something goes wrong.
+
