@@ -1,0 +1,23 @@
+What I Learned:
+A golden image is a standard, pre-configured template used to deploy systems consistently. It provides the same software, configuration, and security settings across multiple systems.
+RHEL Image Builder is used to create customised RHEL system images instead of configuring every system manually.
+
+Image Builder Options
+•	Insights Image Builder → hosted through the Red Hat Hybrid Cloud Console.
+•	RHEL Image Builder → runs locally on a RHEL system and can be managed through the command line or RHEL Web Console.
+Insights Image Builder = hosted
+RHEL Image Builder = local
+
+Blueprints
+A blueprint defines what should be included in the final system image. It can specify packages, users, configuration, networking, security settings, services, and other system requirements.
+Blueprint = specification
+Image = finished system
+This connects to the Robot World project because a blueprint could define a consistent environment for deploying the Java application instead of manually configuring each server.
+
+Image Building Process
+Create blueprint → Define system requirements → Build image → Deploy image
+Once a blueprint is created, it can be reused to produce consistent system images.
+
+Overall Understanding
+The main idea is standardised and repeatable deployment: define the desired system once, build an image from that definition, and reuse it across environments.
+
