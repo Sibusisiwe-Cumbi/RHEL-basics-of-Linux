@@ -1,0 +1,227 @@
+What I Learned:
+This lesson introduced Linux file permissions and ownership, which are important parts of Linux security. File permissions determine who can access a file or directory and what they are allowed to do with it.
+The main topics covered were:
+•	Permissions
+•	Users and groups
+•	chmod
+•	File ownership
+•	chown
+•	chgrp
+•	How Linux decides which permissions apply to a user
+
+File Permissions
+Linux has three basic permissions:
+•	Read (r) — numeric value 4 — read or view contents
+•	Write (w) — numeric value 2 — modify contents
+•	Execute (x) — numeric value 1 — execute or run; for directories, enter or traverse
+
+The numeric values can be combined:
+•	4 = read
+•	2 = write
+•	1 = execute
+•	6 = read + write
+•	5 = read + execute
+•	3 = write + execute
+•	7 = read + write + execute
+•	0 = no permissions
+This is why a permission such as 7 represents rwx.
+
+Who Permissions Apply To
+Permissions are defined for three categories:
+1.	User — the owning user
+2.	Group — the owning group
+3.	Other — everyone who is neither the owning user nor a member of the owning group
+The order is:
+USER → GROUP → OTHER
+An important point is that "other" does not mean everyone. It refers only to users who are not the owning user and are not members of the owning group.
+
+Viewing Permissions
+To view the permissions of a file, use:
+ls -l filename
+For example:
+ls -l file.txt
+To view information about a directory itself instead of its contents, use:
+ls -ld directory
+The -d option tells ls to display information about the directory itself.
+
+Permissions on Directories
+Directory permissions work slightly differently from permissions on normal files.
+Execute Permission
+Execute (x) permission on a directory allows a user to enter or traverse the directory.
+For example:
+cd foo
+requires execute permission on the directory.
+Read and Execute Permissions
+Read (r) and execute (x) together allow a user to list the contents of a directory.
+For example:
+ls foo
+requires r+x on the directory.
+
+Write and Execute Permissions
+Write (w) and execute (x) allow a user to create and delete files within a directory.
+For example:
+touch foo/bar
+requires write and execute permissions on foo.
+An important distinction is that deleting a file generally depends on permissions on the directory containing the file, not write permission on the file itself. This is because deleting a file removes its entry from the directory.
+
+Permissions on Files
+For normal files:
+•	Read (r) allows the contents of the file to be read.
+•	Write (w) allows the contents to be modified.
+•	Execute (x) allows the file to be executed as a program when appropriate.
+An executable program generally needs execute permission in order to run.
+Changing Permissions with chmod
+The chmod command is used to change file or directory permissions.
+One way to use chmod is with numeric or octal permissions.
+For example:
+chmod 001 foo
+The three numbers represent:
+USER   GROUP   OTHER
+ 0       0       1
+Therefore:
+•	User = 0
+•	Group = 0
+•	Other = 1 (x)
+Another example is:
+chmod 075 foo
+This means:
+USER   GROUP   OTHER
+ 0       7       5
+Therefore:
+•	User = 0
+•	Group = 7 (rwx)
+•	Other = 5 (r-x)
+
+Permission Demonstration
+The lesson demonstrated how changing permissions affects what a user can do.
+Starting with:
+chmod 000 foo
+means that the user, group, and other categories have no permissions.
+Then:
+chmod 001 foo
+gives other execute permission. A user classified as other can enter or traverse the directory, but cannot list its contents because they do not have read permission.
+Next:
+chmod 005 foo
+gives other permissions r+x.
+The user can now enter the directory and list its contents, but cannot create files because they do not have write permission.
+Finally:
+chmod 007 foo
+gives other rwx.
+The user can now read the directory, enter it, and create files inside it.
+For example:
+touch bar
+
+File Ownership
+When a user creates a file, that user becomes the owner of the file.
+The file also has an owning group.
+For example, if a user creates a file called bar, its ownership could be represented as:
+User:  R G da Costa
+Group: <user's group>
+Understanding ownership is important because Linux uses the owning user and owning group when determining which permissions apply.
+
+Changing Ownership with chown
+The chown command means change owner. It is used to change the ownership of a file or directory.
+For example:
+chown username file
+changes the owning user.
+chown can also change both the user and group using a colon:
+chown user:group file
+For example:
+chown alice:developers file
+means:
+Owner = alice
+Group = developers
+Changing ownership is a privileged operation and normally requires root privileges.
+Changing the Group with chgrp
+The chgrp command is used specifically to change the owning group.
+For example:
+chgrp developers file
+The difference is:
+chown → can change the user and/or group ownership
+chgrp → changes the group ownership only
+Recursive Ownership Changes
+The -R option commonly means recursively.
+For example:
+chown -R user:group foo
+applies the ownership change to:
+•	The foo directory
+•	Files inside it
+•	Subdirectories
+•	Files inside those subdirectories
+In other words, the change is applied to the directory and everything underneath it.
+
+How Linux Evaluates Permissions
+One of the most important concepts from this lesson is understanding how Linux decides which permissions to use.
+Linux evaluates permissions in this order:
+OWNER → GROUP → OTHER
+Suppose a file or directory has:
+User  = RG da Costa
+Group = root
+
+Linux first asks:
+Is the person accessing it the owning user?
+If yes, Linux uses the USER permissions and stops.
+It does not continue checking the group or other permissions.
+If the person is not the owner, Linux checks whether they are a member of the owning group. If they are, Linux uses the GROUP permissions.
+If neither applies, Linux uses the OTHER permissions.
+The important rule is:
+Once Linux finds the matching category, it stops evaluating the other categories.
+
+Example
+Suppose foo is owned by RG da Costa and the owner permissions are:
+---
+Even if RG da Costa belongs to a group that has rwx permissions, those group permissions do not give the user additional access.
+The user is already classified as the owner, so Linux uses the owner's permissions.
+If the owner does not have execute permission, this command:
+cd foo
+will fail with Permission denied, even if the other category has rwx.
+This is because Linux does not fall through to another category when the matching category has insufficient permissions.
+Principle of Least Privilege
+The lesson also reinforced an important security principle: users should only be given the permissions they actually need.
+This is known as the principle of least privilege.
+For example, unnecessary write or execute permissions should not be given to other, because this could allow users who should not have access to modify or execute files.
+Properly managing permissions and ownership helps protect sensitive information and prevents unauthorised changes to the system.
+Quick Cheat Sheet
+Permissions
+r = 4
+w = 2
+x = 1
+
+7 = rwx
+6 = rw-
+5 = r-x
+4 = r--
+3 = -wx
+2 = -w-
+1 = --x
+0 = ---
+
+Permission Categories
+USER → GROUP → OTHER
+Directory Permissions
+•	x — enter or traverse the directory
+•	r+x — list the directory contents
+•	w+x — create and delete files
+•	r+w+x — full basic access
+Important Commands
+ls -l file
+ls -ld directory
+
+chmod 755 file
+
+chown user:group file
+
+chgrp group file
+
+chown -R user:group directory
+-R means recursively.
+Overall Understanding
+This lesson helped me understand that Linux permissions are not just about giving or denying access. They are a structured security system based on permissions, ownership, and groups.
+The most important concepts were:
+•	The three permissions: r, w, and x
+•	The three permission categories: user, group, and other
+•	How directory permissions differ from file permissions
+•	How Linux evaluates permissions in the order owner → group → other
+•	How chmod, chown, and chgrp are used
+Understanding these concepts is important because file permissions are one of the fundamental ways Linux controls access to files and protects system resources.
+
