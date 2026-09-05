@@ -121,3 +121,4 @@ Most importantly, I was able to relate the Linux concepts from this course back 
 **Red Hat Enterprise Linux Technical Overview (RH024)**
 
 This repository contains my notes and key learnings from the course, organised by topic/lesson.
+WTC-P2D6HMC9
